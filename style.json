@@ -1,0 +1,105 @@
+{
+  "QMainWindow": [
+    {
+      "title": "Data Analytics Dashboard",
+      "icon": ":/icons/icons/007-analytics-2",
+      "frameless": "true",
+      "translucentBg": "true",
+      "sizeGrip": "size_grid",
+      "shadow": [
+        {
+          "color": "#fff",
+          "blurRadius": 20,
+          "xOffset": 0,
+          "yOffset": 0,
+          "centralWidget": "centralWidget"
+        }
+      ],
+      "navigation": [
+        {
+          "minimize": "pushButton_9",
+          "close": "pushButton_10",
+          "restore": [
+            {
+              "buttonName": "pushButton_8",
+              "normalIcon": ":/icons/icons/021-stop.svg",
+              "maximizedIcon": ":/icons/icons/051-minimize.svg"
+            }
+          ],
+          "moveWindow": "frame_3",
+          "titleBar": "frame_3"
+        }
+      ]
+    }
+  ],
+  "QStackedWidget": [
+    {
+      "name": "stackedWidget",
+      "transitionAnimation": [
+        {
+          "slide": [
+            {
+              "active": true,
+              "duration": 1000,
+              "direction": "horizontal",
+              "easingCurve": "Linear"
+            }
+          ]
+        }
+      ],
+      "navigation": [
+        {
+          "navigationButtons": [
+            {
+              "pushButton": "predictions",
+              "pushButton_2": "inputs",
+               "pushButton_3": "Time_2",
+              "pushButton_4": "Inventory"
+            }
+          ]
+        }
+      ]
+    }
+
+  ],
+  "QCustomSlideMenu": [
+    {
+      "name": "left_menu",
+      "defaultSize": [
+        {
+          "width": 0,
+          "height": "parent"
+        }
+      ],
+      "collapsedSize": [
+        {
+          "width": 0,
+          "height": "parent"
+        }
+      ],
+      "expandedSize": [
+        {
+          "width": 250,
+          "height": "parent"
+        }
+      ],
+      "toggleButton": [
+        {
+          "buttonName": "pushButton_7",
+          "icons": [
+            {
+              "whenMenuIsCollapsed": ":/icons/icons/078-left-arrow-1.svg",
+              "whenMenuIsExpanded": ":/icons/icons/060-align-left.svg"
+            }
+          ]
+        }
+      ],
+      "menuTransitionAnimation": [
+        {
+          "animationDuration": 200,
+          "animationEasingCurve": "Linear"
+        }
+      ]
+    }
+  ]
+}
