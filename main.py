@@ -1,25 +1,17 @@
-
+import sys
+import webbrowser
 
 import numpy as np
 import pandas as pd
+from PySide2.QtCharts import QtCharts
+from PySide2.QtCore import QDate
+from PySide2.QtWidgets import (QApplication, QHeaderView, QMainWindow,
+                               QTableWidgetItem)
 from sklearn.metrics import r2_score
 
-
-from PySide2.QtCharts import QtCharts
-from PySide2.QtWidgets import QTabWidget, QTableWidgetItem, QHeaderView
-from PySide2.QtCore import QDate
-
-import webbrowser
-
-
-
+from ui_interface import Ui_MainWindow
 
 # IMPORT GUI FILE
-
-
-from ui_interface import *
-
-
 
 
 class MainWindow(QMainWindow):
@@ -58,9 +50,6 @@ class MainWindow(QMainWindow):
 
         self.ui.pushButton_24.clicked.connect(self.banner)
 
-
-
-
         # Calendar
         from datetime import datetime
         month = datetime.now().month
@@ -71,7 +60,8 @@ class MainWindow(QMainWindow):
 
         self.show()
 
-    def browsefiles(self):  # ----------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
+    def browsefiles(self):
         filename = QFileDialog.getOpenFileName()
         path = filename[0]
 
@@ -83,7 +73,8 @@ class MainWindow(QMainWindow):
         y = df.iloc[:, -1].values
 
         from sklearn.model_selection import train_test_split
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=0)
 
         # Training the Polynomial Regression model on the whole dataset
         from sklearn.linear_model import LinearRegression
@@ -111,9 +102,9 @@ class MainWindow(QMainWindow):
 
         arr = np.arange(len(y) + 1, len(y) + 7, 1)
 
-        self.predictions = regressor.predict(poly_reg.transform(np.reshape(arr, (-1, 1))))
+        self.predictions = regressor.predict(
+            poly_reg.transform(np.reshape(arr, (-1, 1))))
         y_pred = regressor.predict(poly_reg.transform(X_test))
-
 
         np.set_printoptions(precision=2)
 
@@ -129,7 +120,8 @@ class MainWindow(QMainWindow):
         y_axis = []
         response = intercept
         for coef_in in coef:
-            response += coef[coef.index(coef_in)] * x_axis ** coef.index(coef_in)
+            response += coef[coef.index(coef_in)] * \
+                x_axis ** coef.index(coef_in)
         y_axis.append(response)
 
         y_axis = [value for value in y_axis]
@@ -204,7 +196,8 @@ class MainWindow(QMainWindow):
 
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
-        sizePolicy.setHeightForWidth(self.chartView.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.chartView.sizePolicy().hasHeightForWidth())
         self.chartView.setSizePolicy(sizePolicy)
         self.chartView.setMinimumSize(QSize(0, 300))
         self.ui.gridLayout.addWidget(self.chartView, 0, 0, 0, 0)
@@ -245,18 +238,16 @@ class MainWindow(QMainWindow):
         columnCount = self.ui.tableWidget_4.columnCount()
         self.predictions_poly = []
 
-
         for row in range(rowCount):
             for column in range(columnCount):
-                headertext = self.ui.tableWidget_4.horizontalHeaderItem(column).text()
+                headertext = self.ui.tableWidget_4.horizontalHeaderItem(
+                    column).text()
                 if 'Pronostico' == headertext:
 
                     pronost = self.ui.tableWidget_4.item(row, column).text()
                     self.predictions_poly.append(int(pronost))
 
-
         print(self.predictions_poly)
-
 
     def workforce(self):
 
@@ -269,23 +260,28 @@ class MainWindow(QMainWindow):
 
         for row in range(rowCount):
             for column in range(columnCount):
-                headertext = self.ui.tableWidget_2.horizontalHeaderItem(column).text()
+                headertext = self.ui.tableWidget_2.horizontalHeaderItem(
+                    column).text()
                 if col1 == headertext:
                     workforce_data[row] = {}
-                    workforce_data[row][col1] = self.ui.tableWidget_2.item(row, column).text()
+                    workforce_data[row][col1] = self.ui.tableWidget_2.item(
+                        row, column).text()
                 elif col2 == headertext:
-                    workforce_data[row][col2] = self.ui.tableWidget_2.item(row, column).text()
+                    workforce_data[row][col2] = self.ui.tableWidget_2.item(
+                        row, column).text()
                 elif col3 == headertext:
-                    workforce_data[row][col3] = self.ui.tableWidget_2.item(row, column).text()
+                    workforce_data[row][col3] = self.ui.tableWidget_2.item(
+                        row, column).text()
 
-        subtotal = [float(data['Cantidad']) * float(data['Salario']) for data in workforce_data.values()]
+        subtotal = [float(data['Cantidad']) * float(data['Salario'])
+                    for data in workforce_data.values()]
 
         total = 0
         prestaciones = float(self.ui.lineEdit_2.text())
         for value in subtotal:
             total += round(value)
-        self.hora_normal = round(total / 30 / 8,2) * prestaciones
-        self.hora_extra = round(self.hora_normal * 1.5,2)
+        self.hora_normal = round(total / 30 / 8, 2) * prestaciones
+        self.hora_extra = round(self.hora_normal * 1.5, 2)
 
         self.barSeries = QtCharts.QBarSeries()
 
@@ -301,7 +297,8 @@ class MainWindow(QMainWindow):
         self.barSeries.setLabelsVisible(True)
         # series.setLabelsPrecision(2)
         self.barSeries.setLabelsFormat("@value Q")
-        self.barSeries.setLabelsPosition(QtCharts.QAbstractBarSeries.LabelsCenter)
+        self.barSeries.setLabelsPosition(
+            QtCharts.QAbstractBarSeries.LabelsCenter)
 
         self.chart = QtCharts.QChart()
         self.chart.addSeries(self.barSeries)
@@ -323,7 +320,8 @@ class MainWindow(QMainWindow):
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.chartView.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.chartView.sizePolicy().hasHeightForWidth())
         self.chartView.setSizePolicy(sizePolicy)
         self.chartView.setMinimumSize(QSize(0, 300))
         self.ui.verticalLayout_18.addWidget(self.chartView)
@@ -341,22 +339,26 @@ class MainWindow(QMainWindow):
 
         for row in range(self.rowCount):
             for column in range(self.columnCount):
-                headertext = self.ui.tableWidget.horizontalHeaderItem(column).text()
+                headertext = self.ui.tableWidget.horizontalHeaderItem(
+                    column).text()
                 if col1 == headertext:
                     self.feedstock[row] = {}
-                    self.feedstock[row][col1] = self.ui.tableWidget.item(row, column).text()
+                    self.feedstock[row][col1] = self.ui.tableWidget.item(
+                        row, column).text()
                     materials.append(self.feedstock[row][col1])
                 elif col2 == headertext:
-                    self.feedstock[row][col2] = self.ui.tableWidget.item(row, column).text()
+                    self.feedstock[row][col2] = self.ui.tableWidget.item(
+                        row, column).text()
                 elif col3 == headertext:
-                    self.feedstock[row][col3] = self.ui.tableWidget.item(row, column).text()
+                    self.feedstock[row][col3] = self.ui.tableWidget.item(
+                        row, column).text()
 
-
-        subtotal = [float(data['Cantidad/Batch']) * float(data['Costo Q/u']) for data in self.feedstock.values()]
+        subtotal = [float(data['Cantidad/Batch']) * float(data['Costo Q/u'])
+                    for data in self.feedstock.values()]
         total_por_material = []
         batch = float(1 / int(self.ui.lineEdit.text()))
         for value in subtotal:
-            total = round(value * batch,2)
+            total = round(value * batch, 2)
             total_por_material.append(total)
 
         total_unidad = 0
@@ -366,8 +368,6 @@ class MainWindow(QMainWindow):
         self.ritmo_produccion = int(self.ui.lineEdit_4.text())
 
         self.costo_hora = round(total_unidad * self.ritmo_produccion)
-
-
 
         self.ui.label_16.setText(str(f'Q. {round(total_unidad,2)}'))
         self.ui.label_18.setText(str(f'Q. {self.costo_hora}'))
@@ -415,7 +415,8 @@ class MainWindow(QMainWindow):
         self.barSeries.setLabelsVisible(True)
         # series.setLabelsPrecision(2)
         self.barSeries.setLabelsFormat("@value Q")
-        self.barSeries.setLabelsPosition(QtCharts.QAbstractBarSeries.LabelsCenter)
+        self.barSeries.setLabelsPosition(
+            QtCharts.QAbstractBarSeries.LabelsCenter)
 
         self.chart = QtCharts.QChart()
         self.chart.addSeries(self.barSeries)
@@ -436,7 +437,8 @@ class MainWindow(QMainWindow):
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.chartView.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.chartView.sizePolicy().hasHeightForWidth())
         self.chartView.setSizePolicy(sizePolicy)
         self.chartView.setMinimumSize(QSize(0, 300))
         self.ui.verticalLayout_23.addWidget(self.chartView)
@@ -460,7 +462,8 @@ class MainWindow(QMainWindow):
         self.barSeriess.setLabelsVisible(True)
         # series.setLabelsPrecision(2)
         self.barSeriess.setLabelsFormat("@value hr")
-        self.barSeriess.setLabelsPosition(QtCharts.QAbstractBarSeries.LabelsCenter)
+        self.barSeriess.setLabelsPosition(
+            QtCharts.QAbstractBarSeries.LabelsCenter)
 
         self.chart = QtCharts.QChart()
         self.chart.addSeries(self.barSeriess)
@@ -482,7 +485,8 @@ class MainWindow(QMainWindow):
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.chartView.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.chartView.sizePolicy().hasHeightForWidth())
         self.chartView.setSizePolicy(sizePolicy)
         self.chartView.setMinimumSize(QSize(0, 300))
         self.ui.gridLayout_5.addWidget(self.chartView)
@@ -490,13 +494,15 @@ class MainWindow(QMainWindow):
 
     def start_date(self):
 
-        self.ui.label_23.setText(self.ui.calendarWidget.selectedDate().toString())
+        self.ui.label_23.setText(
+            self.ui.calendarWidget.selectedDate().toString())
         self.day_i = self.ui.calendarWidget.selectedDate().day()
         self.month_i = self.ui.calendarWidget.selectedDate().month()
         self.year_i = self.ui.calendarWidget.selectedDate().year()
 
     def end_date(self):
-        self.ui.label_24.setText(self.ui.calendarWidget.selectedDate().toString())
+        self.ui.label_24.setText(
+            self.ui.calendarWidget.selectedDate().toString())
         self.day_f = self.ui.calendarWidget.selectedDate().day()
         self.month_f = self.ui.calendarWidget.selectedDate().month()
         self.year_f = self.ui.calendarWidget.selectedDate().year()
@@ -511,24 +517,18 @@ class MainWindow(QMainWindow):
 
         year = datetime.now().year
 
-
         sab = 0
         lun_vie = 0
 
-
         horas_mes = {}
-        feriados = [f'{year}-01-01',f'{year}-04-01',f'{year}-04-02',f'{year}-05-01',f'{year}-05-01',
-                    f'{year}-06-30',f'{year}-09-15',f'{year}-10-20',f'{year}-11-01',f'{year}-12-24',f'{year}-12-25',
-                    f'{year}-12-31','2022-04-14','2022-04-15','2022-04-16']
+        feriados = [f'{year}-01-01', f'{year}-04-01', f'{year}-04-02', f'{year}-05-01', f'{year}-05-01',
+                    f'{year}-06-30', f'{year}-09-15', f'{year}-10-20', f'{year}-11-01', f'{year}-12-24', f'{year}-12-25',
+                    f'{year}-12-31', '2022-04-14', '2022-04-15', '2022-04-16']
 
         if self.ui.comboBox.currentText() == 'Jornada Diurna':
 
             for d_ord in range(d_i.toordinal(), d_f.toordinal()+1):
                 d = date.fromordinal(d_ord)
-
-
-
-
 
                 if not d.strftime("%B") in horas_mes:
 
@@ -536,46 +536,44 @@ class MainWindow(QMainWindow):
 
                     for mes in horas_mes:
                         if mes == d.strftime("%B"):
-                          if d.strftime("%A") != 'Saturday' and d.strftime("%A") != 'Sunday' and str(d) not in feriados :
+                            if d.strftime("%A") != 'Saturday' and d.strftime("%A") != 'Sunday' and str(d) not in feriados:
 
-                                  lun_vie += 1
-                                  horas_mes[mes]['lun-vie'] = lun_vie
+                                lun_vie += 1
+                                horas_mes[mes]['lun-vie'] = lun_vie
 
-                          elif  d.strftime("%A") == 'Saturday' and str(d) not in feriados :
-                                 sab += 1
-                                 horas_mes[mes]['sab'] = sab
-
+                            elif d.strftime("%A") == 'Saturday' and str(d) not in feriados:
+                                sab += 1
+                                horas_mes[mes]['sab'] = sab
 
                         else:
-                            lun_vie= 0
-                            sab=0
+                            lun_vie = 0
+                            sab = 0
                 else:
                     for mes in horas_mes:
                         if mes == d.strftime("%B"):
-                          if d.strftime("%A") != 'Saturday' and d.strftime("%A") != 'Sunday'and str(d) not in feriados :
-                                  lun_vie += 1
-                                  horas_mes[mes]['lun-vie'] = lun_vie
-                          elif  d.strftime("%A") == 'Saturday' and str(d) not in feriados :
-                                 sab += 1
-                                 horas_mes[mes]['sab'] = sab
+                            if d.strftime("%A") != 'Saturday' and d.strftime("%A") != 'Sunday' and str(d) not in feriados:
+                                lun_vie += 1
+                                horas_mes[mes]['lun-vie'] = lun_vie
+                            elif d.strftime("%A") == 'Saturday' and str(d) not in feriados:
+                                sab += 1
+                                horas_mes[mes]['sab'] = sab
 
-
-        #Adding normal and extras hours to the dictionary------
+        # Adding normal and extras hours to the dictionary------
             months = []
             for month in horas_mes:
-                horas_mes[month]['norm'] = horas_mes[month]['lun-vie']*8 + horas_mes[month]['sab']*4
-                horas_mes[month]['extras'] = horas_mes[month]['lun-vie'] * 4 + horas_mes[month]['sab'] * 8
+                horas_mes[month]['norm'] = horas_mes[month]['lun-vie'] * \
+                    8 + horas_mes[month]['sab']*4
+                horas_mes[month]['extras'] = horas_mes[month]['lun-vie'] * \
+                    4 + horas_mes[month]['sab'] * 8
                 months.append(month)
             self.tiempo_disp = horas_mes
             print(self.tiempo_disp)
 
-
-        #Displaying Chart----------------------------------------------------------
+        # Displaying Chart----------------------------------------------------------
 
             h_normal = QtCharts.QBarSet('Horas Normales')
             h_extra = QtCharts.QBarSet('Horas Extras')
             for month in horas_mes:
-
 
                 h_normal.append(horas_mes[month]['norm'])
                 h_extra.append(horas_mes[month]['extras'])
@@ -610,13 +608,9 @@ class MainWindow(QMainWindow):
             self.chart.legend().setAlignment(Qt.AlignBottom)
             self.chart.setBackgroundVisible(visible=False)
 
-
-
             self.chartView = QtCharts.QChartView(self.chart)
             self.chartView.update()
             self.chartView.chart().setTheme(QtCharts.QChart.ChartThemeDark)
-
-
 
             self.ui.verticalLayout_25.addWidget(self.chartView)
             self.ui.frame_46.setStyleSheet(u"background-color: transparent")
@@ -624,7 +618,6 @@ class MainWindow(QMainWindow):
     def diurnaEspecial(self):
 
         from datetime import date, datetime
-
 
         if self.ui.comboBox.currentText() == 'Jornada Diurna Especial':
 
@@ -663,7 +656,6 @@ class MainWindow(QMainWindow):
                                     vie += 1
                                     horas_mes[mes]['vie'] = vie
 
-
                             else:
                                 lun_jue = 0
                                 vie = 0
@@ -678,12 +670,13 @@ class MainWindow(QMainWindow):
                                     vie += 1
                                     horas_mes[mes]['vie'] = vie
 
-
                 # Adding normal and extras hours to the dictionary------
             months = []
             for month in horas_mes:
-                horas_mes[month]['norm'] = horas_mes[month]['lun-jue'] * 9 + horas_mes[month]['vie'] * 8
-                horas_mes[month]['extras'] = horas_mes[month]['lun-jue'] * 3 + horas_mes[month]['vie'] * 4
+                horas_mes[month]['norm'] = horas_mes[month]['lun-jue'] * \
+                    9 + horas_mes[month]['vie'] * 8
+                horas_mes[month]['extras'] = horas_mes[month]['lun-jue'] * \
+                    3 + horas_mes[month]['vie'] * 4
                 months.append(month)
 
             # Displaying Chart----------------------------------------------------------
@@ -725,18 +718,15 @@ class MainWindow(QMainWindow):
             self.chart.setBackgroundVisible(visible=False)
             self.chartView.deleteLater()
 
-
             self.chartView = QtCharts.QChartView(self.chart)
             self.chartView.update()
             self.chartView.chart().setTheme(QtCharts.QChart.ChartThemeDark)
-
 
             self.ui.verticalLayout_25.addWidget(self.chartView)
             self.ui.frame_46.setStyleSheet(u"background-color: transparent")
         else:
             self.chartView.deleteLater()
             self.time_available()
-
 
     def addRow(self, arg):
         if arg == 1:
@@ -754,34 +744,40 @@ class MainWindow(QMainWindow):
     def removeRow(self, arg):
         if arg == 1:
             if self.ui.tableWidget_2.rowCount() > 0:
-                self.ui.tableWidget_2.removeRow(self.ui.tableWidget_2.rowCount() - 1)
+                self.ui.tableWidget_2.removeRow(
+                    self.ui.tableWidget_2.rowCount() - 1)
         elif arg == 2:
             if self.ui.tableWidget.rowCount() > 0:
-                self.ui.tableWidget.removeRow(self.ui.tableWidget.rowCount() - 1)
-        elif arg ==3:
+                self.ui.tableWidget.removeRow(
+                    self.ui.tableWidget.rowCount() - 1)
+        elif arg == 3:
             if self.ui.tableWidget_4.rowCount() > 0:
-                self.ui.tableWidget_4.removeRow(self.ui.tableWidget_4.rowCount() - 1)
+                self.ui.tableWidget_4.removeRow(
+                    self.ui.tableWidget_4.rowCount() - 1)
 
             self.ui.tableWidget_2.horizontalHeader().setStretchLastSection(True)
             self.ui.tableWidget_2.horizontalHeader().setSectionResizeMode(
                 QHeaderView.Stretch)
 
     def next_page(self):
-        self.ui.stackedWidget_2.setCurrentIndex((self.ui.stackedWidget_2.currentIndex() + 1))
+        self.ui.stackedWidget_2.setCurrentIndex(
+            (self.ui.stackedWidget_2.currentIndex() + 1))
 
     def prev_page(self):
-        self.ui.stackedWidget_2.setCurrentIndex((self.ui.stackedWidget_2.currentIndex() - 1))
+        self.ui.stackedWidget_2.setCurrentIndex(
+            (self.ui.stackedWidget_2.currentIndex() - 1))
 
     def inventario(self):
         inventario = self.ui.tableWidget_3
         inventario.setRowCount(self.rowCount)
         for row in range(self.rowCount):
-         inventario.setItem(row,0,QTableWidgetItem(self.ui.tableWidget.item(row, 0).text()))
+            inventario.setItem(row, 0, QTableWidgetItem(
+                self.ui.tableWidget.item(row, 0).text()))
 
         self.predictions_2 = self.predictions_poly
         self.total_predict = 0
         for predict in self.predictions_2:
-            self.total_predict+=predict
+            self.total_predict += predict
 
         self.material = []
         self.tot_material = []
@@ -789,14 +785,14 @@ class MainWindow(QMainWindow):
         for mat in self.feedstock.values():
 
             self.material.append(mat['Material'])
-            self.tot_material.append(float(mat['Cantidad/Batch'])*self.total_predict/int(self.ui.lineEdit.text()))
+            self.tot_material.append(
+                float(mat['Cantidad/Batch'])*self.total_predict/int(self.ui.lineEdit.text()))
 
-    #TODO -------- CREAR GRAFICA DE BARRAS AQUI
+    # TODO -------- CREAR GRAFICA DE BARRAS AQUI
 
         self.barSeriess2 = QtCharts.QBarSeries()
 
-        for material, total in zip(self.material,self.tot_material):
-
+        for material, total in zip(self.material, self.tot_material):
 
             self.sett = QtCharts.QBarSet(material)
             self.sett.append(total)
@@ -805,7 +801,8 @@ class MainWindow(QMainWindow):
         self.barSeriess2.setLabelsVisible(True)
         # series.setLabelsPrecision(2)
         self.barSeriess2.setLabelsFormat("@value u")
-        self.barSeriess2.setLabelsPosition(QtCharts.QAbstractBarSeries.LabelsOutsideEnd)
+        self.barSeriess2.setLabelsPosition(
+            QtCharts.QAbstractBarSeries.LabelsOutsideEnd)
 
         self.chart = QtCharts.QChart()
         self.chart.addSeries(self.barSeriess2)
@@ -827,12 +824,12 @@ class MainWindow(QMainWindow):
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.chartView.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.chartView.sizePolicy().hasHeightForWidth())
         self.chartView.setSizePolicy(sizePolicy)
         self.chartView.setMinimumSize(QSize(0, 300))
         self.ui.gridLayout_7.addWidget(self.chartView)
         self.ui.tabWidget.setStyleSheet(u"background-color: transparent")
-
 
     def inventory_charts(self):
         index_total = 0
@@ -843,70 +840,67 @@ class MainWindow(QMainWindow):
 
             for column in range(self.ui.tableWidget_3.columnCount()):
 
-
-                headertext = self.ui.tableWidget_3.horizontalHeaderItem(column).text()
+                headertext = self.ui.tableWidget_3.horizontalHeaderItem(
+                    column).text()
                 plannificado = self.tot_material[index_total]
 
-
                 if headertext == 'Existencia':
-                    exist1 = float(self.ui.tableWidget_3.item(row,column).text())
+                    exist1 = float(
+                        self.ui.tableWidget_3.item(row, column).text())
 
                 elif headertext == 'T. Entrega':
                     Rn = float(self.ui.tableWidget_3.item(row, column).text())
 
                 elif headertext == 'T. Tardío':
-                    tardio = float(self.ui.tableWidget_3.item(row, column).text())
-                    Rs = tardio-float(self.ui.tableWidget_3.item(row, 2).text())
+                    tardio = float(
+                        self.ui.tableWidget_3.item(row, column).text())
+                    Rs = tardio - \
+                        float(self.ui.tableWidget_3.item(row, 2).text())
 
                 elif headertext == 'N max':
-                    Nmax = float(self.ui.tableWidget_3.item(row, column).text())
-
-
-
+                    Nmax = float(self.ui.tableWidget_3.item(
+                        row, column).text())
 
             ciclo = len(self.predictions_2)
-            Ss = round((plannificado/ciclo)*Rs,2)
-            Nr = round((plannificado/ciclo)*Rn,2)
-            nMax = round((plannificado/ciclo)*Nmax,2)
-            Opt = round((2*Ss)+Nr,2)
-            exist2 = round(Opt + Ss,2)
+            Ss = round((plannificado/ciclo)*Rs, 2)
+            Nr = round((plannificado/ciclo)*Rn, 2)
+            nMax = round((plannificado/ciclo)*Nmax, 2)
+            Opt = round((2*Ss)+Nr, 2)
+            exist2 = round(Opt + Ss, 2)
             LTC1 = (exist1/plannificado)*ciclo
             LTC2 = (exist2/plannificado)*ciclo
             x1 = LTC1*(exist1-Nr)/(exist1-Ss)
             x2 = LTC2*(exist2-Nr)/(exist2-Ss)
 
             series = QtCharts.QLineSeries()
-            series.append(0,exist1)
-            series.append(LTC1,Ss)
-            series.append(LTC1,exist2)
-            series.append(LTC1+LTC2,Ss)
-            series.append(LTC1+LTC2,exist2)
+            series.append(0, exist1)
+            series.append(LTC1, Ss)
+            series.append(LTC1, exist2)
+            series.append(LTC1+LTC2, Ss)
+            series.append(LTC1+LTC2, exist2)
             series.append(LTC1 + (2*LTC2), Ss)
             series.setName('Inventario')
 
             nmax_series = QtCharts.QLineSeries()
-            nmax_series.append(0,nMax)
+            nmax_series.append(0, nMax)
             nmax_series.append(LTC1+2*LTC2, nMax)
             nmax_series.setName('Nmax')
 
-
             exist2_series = QtCharts.QLineSeries()
-            exist2_series.append(0,exist2)
+            exist2_series.append(0, exist2)
             exist2_series.append(LTC1+2*LTC2, exist2)
             exist2_series.setName('Existencia2')
 
             Nr_series = QtCharts.QLineSeries()
-            Nr_series.append(0,Nr)
+            Nr_series.append(0, Nr)
             Nr_series.append(LTC1+2*LTC2, Nr)
             Nr_series.setColor(QtGui.QColor("yellow"))
             Nr_series.setName('NR')
 
             Ss_series = QtCharts.QLineSeries()
-            Ss_series.append(0,Ss)
+            Ss_series.append(0, Ss)
             Ss_series.append(LTC1+2*LTC2, Ss)
             Ss_series.setName('Ss')
-
-
 
             chart = QtCharts.QChart()
             chart.addSeries(series)
@@ -915,7 +909,6 @@ class MainWindow(QMainWindow):
             chart.addSeries(Nr_series)
             chart.addSeries(Ss_series)
 
-
             chart.setAnimationOptions(QtCharts.QChart.SeriesAnimations)
 
             chart.setTitle(f"{self.material[index_total]}: \nNmax: {nMax}, Existencia 2: {exist2},NR: {Nr}, "
@@ -923,8 +916,6 @@ class MainWindow(QMainWindow):
             index_total += 1
 
             chart.createDefaultAxes()
-
-
 
             chart.legend().setVisible(True)
             chart.legend().setAlignment(Qt.AlignBottom)
@@ -938,16 +929,14 @@ class MainWindow(QMainWindow):
             self.ui.verticalLayout_28.addWidget(self.ui.chart_view)
             self.ui.chart_view.setStyleSheet(u"background-color: transparent")
 
-
     def report(self):
         import anvil.server
 
         #### TODO: Replace this uplink key with the key for your own app ####
         anvil.server.connect("WBD6TS6XUWAG46XQBBZBKP34-6WKXLNNRYBZWOQI5")
 
-        import anvil.pdf
         import anvil.media
-
+        import anvil.pdf
 
         total_por_material = []
         items = []
@@ -955,7 +944,7 @@ class MainWindow(QMainWindow):
         dict = {}
         dict_item = {}
         id = 0
-        for mater , total in zip(self.material,self.tot_material):
+        for mater, total in zip(self.material, self.tot_material):
 
             if id == self.material.index(mater):
 
@@ -964,7 +953,6 @@ class MainWindow(QMainWindow):
                 dict['data_key'] = mater.lower()
 
                 dict_item[f'{mater.lower()}'] = total
-
 
                 dict_copy = dict.copy()
                 total_por_material.append(dict_copy)
@@ -976,7 +964,7 @@ class MainWindow(QMainWindow):
 
         items.append(dict_item_copy)
 
-        #Tiempo requerido resumen--------------------------
+        # Tiempo requerido resumen--------------------------
         requerido = []
         dict_tiempo = {}
 
@@ -984,24 +972,24 @@ class MainWindow(QMainWindow):
         dict_itmes2 = {}
 
         id_2 = 0
-        for hr in  self.requerido:
-          dict_tiempo['id']= id_2
-          dict_tiempo['title']= f'Mes {id_2+1}'
-          dict_tiempo['data_key']=  f'Mes {id_2+1}'
+        for hr in self.requerido:
+            dict_tiempo['id'] = id_2
+            dict_tiempo['title'] = f'Mes {id_2+1}'
+            dict_tiempo['data_key'] = f'Mes {id_2+1}'
 
-          dict_itmes2[ f'Mes {id_2+1}'] = round(hr)
+            dict_itmes2[f'Mes {id_2+1}'] = round(hr)
 
-          dict_tiempo_copy = dict_tiempo.copy()
-          requerido.append(dict_tiempo_copy)
+            dict_tiempo_copy = dict_tiempo.copy()
+            requerido.append(dict_tiempo_copy)
 
-          dict_itmes2_copy = dict_itmes2.copy()
+            dict_itmes2_copy = dict_itmes2.copy()
 
-          dict_tiempo = {}
-          id_2 += 1
+            dict_tiempo = {}
+            id_2 += 1
         items2.append(dict_itmes2_copy)
         print(items2)
 
-        #ploting bar chart of time available------------------------------
+        # ploting bar chart of time available------------------------------
         available = []
         aval = {}
         for month in self.tiempo_disp:
@@ -1018,7 +1006,8 @@ class MainWindow(QMainWindow):
 
         total = self.total_predict
 
-        pdf = anvil.pdf.render_form("ReportForm", total, total_por_material, items,requerido,items2,available,normal,extra)
+        pdf = anvil.pdf.render_form(
+            "ReportForm", total, total_por_material, items, requerido, items2, available, normal, extra)
         anvil.media.write_to_file(pdf, "report.pdf")
 
     def youtube(self):
